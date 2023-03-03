@@ -1,78 +1,61 @@
+import csv
+
 class Item:
-    discount = 0.85
+    pay_rate = 1
+    all = []
 
-    def __init__(self, name, price, quantity):
-        """Название товара, цена за единицу, количество товара в магазине"""
-        self.name = name
+    def __init__(self, name, price, count):
+        self.__name = name
         self.price = price
-        self.quantity = quantity
+        self.count = count
+        Item.all.append(self)
 
-    def total_cost (self):
-        """общая стоимость товара"""
-        return self.quantity * self.price
+    @property
+    def name(self):
+        return self.__name
 
-    def price_discount (self):
-        """Скидка для товара"""
-        return self.price * self.discount
+    @name.setter
+    def name(self, name):
+        if len(name) > 10:
+            raise Exception('Длина наименования товара превышает 10 символов')
+        self.__name = name
 
+    def calculate_total_price(self):
+        return self.price * self.count
 
-item1 = Item("Смартфон", 10_000, 20)
-item1.total_cost()
-item1.price_discount
-print(item1.name)
-print(f'Общая стоимость товара = {item1.total_cost()}')
-print(f'Стоимость товара с учетом скидки = {item1.price_discount()}')
+    def apply_discount(self):
+        self.price = self.price * self.pay_rate
 
-item2 = Item("Ноутбук", 20000, 5)
-print(item2.name)
-item2.total_cost()
-print(f'Общая стоимость товара = {item2.total_cost()}')
-item2.price_discount()
-print(f'Стоимость товара с учетом скидки = {item2.price_discount()}')
+    @classmethod
+    def instantiate_from_csv(cls):
+        with open('items.csv', 'r', encoding='windows-1251') as f:
+            reader = csv.reader(f)
+            rows = []
+            for row in reader:
+                rows.append(row)
+            for a in rows[1:len(rows)]:
+                if Item.is_integer(float(a[1])):
+                    a[1] = int(a[1])
+                if Item.is_integer(float(a[2])):
+                    a[2] = int(a[2])
+                cls(a[0], a[1], a[2])
 
+    @staticmethod
+    def is_integer(num):
+        if num - int(num) == 0:
+            return True
+        else:
+            return False
 
+item = Item('Телефон', 10000, 5)
+item.name = 'Смартфон'
+print(item.name) # Смартфон
 
+Item.instantiate_from_csv()  # создание объектов из данных файла
+print(len(Item.all))  # в файле 5 записей с данными по товарам
+item1 = Item.all[0]
+print(item1.name) #Смартфон
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#item2 = Item("Ноутбук", 20000, 5)
-
-#print(item1.calculate_total_price())
-#print(item2.calculate_total_price())
-#200000  # общая стоимость смартфонов
-#100000  # общая стоимость ноутбуков
-
-
-#item1.apply_discount()
-#print(item1.price)
-#print(item2.price)
-#8000.0  # к цене смартфона применена скидка
-#20000  # к цене ноутбука скидка не была применена
-
-#print(Item.all)
-#[<__main__.Item object at 0x000001EC6250C690>, <__main__.Item object at 0x000001EC6250C6D0>]
+print(Item.is_integer(5)) # True
+print(Item.is_integer(5.0)) # True
+print(Item.is_integer(5.5)) # False
