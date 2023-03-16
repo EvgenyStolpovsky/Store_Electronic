@@ -1,5 +1,5 @@
 import pytest
-from store.utils import Item
+from store.utils import Item, Phone
 def test_calculate_total_price():
     item = Item("Ноутбук", 20000, 5)
     assert item.calculate_total_price() == 100_000
@@ -16,3 +16,10 @@ def test__repr__():
 def test__str__():
     item1 = Item("Смартфон", 10_000, 20)
     assert item1.__str__() != Item("Смартфон", 10_000, 20)
+
+def test__init__Phone():
+    """Инициализация экземпляра дочернего класса"""
+    phone1 = Phone("iPhone 14", 120_000, 5, 2)
+    assert phone1.name == "iPhone 14"
+    assert phone1.price == 120_000
+    assert phone1.count == 5
