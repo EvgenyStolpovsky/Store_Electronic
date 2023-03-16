@@ -1,10 +1,12 @@
 import csv
 
+
 class Item:
     pay_rate = 1
     all = []
 
-    def __init__(self, name, price, count):
+    def __init__(self, name: object, price: object, count: object) -> object:
+        """Название товара, цена за единицу и количество товара в магазине"""
         self.__name = name
         self.price = price
         self.count = count
@@ -20,10 +22,12 @@ class Item:
             raise Exception('Длина наименования товара превышает 10 символов')
         self.__name = name
 
-    def calculate_total_price(self):
+    def calculate_total_price(self) -> int:
+        """Общая стоимость товара"""
         return self.price * self.count
 
-    def apply_discount(self):
+    def apply_discount(self) -> int:
+        """Скидка для товара"""
         self.price = self.price * self.pay_rate
 
     @classmethod
@@ -48,45 +52,63 @@ class Item:
             return False
 
     def __repr__(self):
-        return f'{self.__name}, {self.price}, {self.count}'
+        return f"Item('{self.name}', '{self.price}', '{self.count}')"
 
     def __str__(self):
         return f'{self.name}'
+
     def __add__(self, other):
+        """Сложение количества товара. """
         if isinstance(other, Item):
             return self.count + other.count
         else:
-            raise ValueError("Сложение с другими аргументами класса запрещено")
+            raise ValueError('Сложение с другими аргументами класса запрещено')
+
 
 class Phone(Item):
-    """Класс телефон, наследственный класс"""
-    def __init__(self, name, price, count, sim_card):
-        """Инициализация нового атрубута- количество сим-карт"""
+    """Класс телефон, наследственный класс."""
+
+    def __init__(self, name, price, count, sim_kart):
+        """Инициализация нового атрибута - количество сим карт."""
         super().__init__(name, price, count)
-        self.sim_card = sim_card
-        if sim_card == 0:
-            raise ValueError("Количество физических SIM-карт должно быть целым числом больше нуля.")
+        self.__sim_kart = sim_kart
+        if sim_kart == 0:
+            raise ValueError('Количество физических Sim карт должно быть целым число больше нуля.')
         else:
-            self.sim_card = sim_card
-
-# смартфон iPhone 14, цена 120_000, количетсво товара 5, симкарт 2
-phone1 = Phone("iPhone 14", 120_000, 5, 2)
-print(phone1)
-#iPhone 14
-
-print(repr(phone1))
-#Phone('iPhone 14', 120000, 5, 2)
-
-#phone1.number_of_sim = 0
-#ValueError: Количество физических SIM-карт должно быть целым числом больше нуля.
+            self.__sim_kart = sim_kart
 
 
-item1 = Item("Смартфон", 10_000, 20)
-#print(repr(item1)) # Смартфон, 10000, 20
-#print(item1) # Смартфон
+class MixinLog:
+    def __init__(self, name, price, count):
+        """Иницализация названия, стоимости и кол-во клавиатуры,"""
+        self.__language = 'EN'
+        super().__init__(name, price, count)
+
+    @property
+    def language(self):
+        return self.__language
+
+    def change_lang(self):
+        """Изменение языка раскладка клавиатуры EN - RU"""
+        if self.__language == 'EN':
+            self.__language = 'RU'
+        else:
+            self.__language = 'EN'
 
 
+class KeyBoard(MixinLog, Item):
+    """Клавиатура"""
+    pass
 
 
+item1 = Item('Xiaomi Lite 10', 30_000, 10)
+phone1 = Phone('Iphone 14', 120_000, 5, 5)
 
+kb = KeyBoard('Dark Project KD87A', 9600, 5)
+print(kb)  # Dark Project KD87A.
+print(kb.language)  # EN.
+kb.change_lang()
+print(kb.language)  # RU.
 
+# kb.language = 'CH'
+# AttributeError: property 'language' of 'KeyBoard' object has no setter
