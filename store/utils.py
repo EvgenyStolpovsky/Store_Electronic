@@ -1,5 +1,7 @@
 import csv
 
+class InstantiateCSVError(Exception):
+    pass
 
 class Item:
     pay_rate = 1
@@ -32,17 +34,23 @@ class Item:
 
     @classmethod
     def instantiate_from_csv(cls):
-        with open('items.csv', 'r', encoding='windows-1251') as f:
-            reader = csv.reader(f)
-            rows = []
-            for row in reader:
-                rows.append(row)
+        try:
+            with open('items.csv', 'r', encoding='windows-1251') as f:
+                reader = csv.reader(f)
+                rows = []
+                for row in reader:
+                    rows.append(row)
+
             for a in rows[1:len(rows)]:
                 if Item.is_integer(float(a[1])):
                     a[1] = int(a[1])
                 if Item.is_integer(float(a[2])):
                     a[2] = int(a[2])
                 cls(a[0], a[1], a[2])
+        except FileNotFoundError:
+            print('Отсутствует файл item.csv')
+        except:
+            raise InstantiateCSVError('Файл items.csv поврежден')
 
     @staticmethod
     def is_integer(num):
@@ -64,7 +72,6 @@ class Item:
         else:
             raise ValueError('Сложение с другими аргументами класса запрещено')
 
-
 class Phone(Item):
     """Класс телефон, наследственный класс."""
 
@@ -76,7 +83,6 @@ class Phone(Item):
             raise ValueError('Количество физических Sim карт должно быть целым число больше нуля.')
         else:
             self.__sim_kart = sim_kart
-
 
 class MixinLog:
     def __init__(self, name, price, count):
@@ -95,20 +101,36 @@ class MixinLog:
         else:
             self.__language = 'EN'
 
-
 class KeyBoard(MixinLog, Item):
-    """Клавиатура"""
+    """Клавиатура новый товар"""
     pass
+
+
+
+# Файл items.csv отсутствует.
+Item.instantiate_from_csv()
+print(Item.all)
+# FileNotFoundError: Отсутствует файл item.csv
+
+# В файле items.csv удалена последняя колонка.
+Item.instantiate_from_csv()
+# InstantiateCSVError: Файл item.csv поврежден
 
 
 item1 = Item('Xiaomi Lite 10', 30_000, 10)
 phone1 = Phone('Iphone 14', 120_000, 5, 5)
-
 kb = KeyBoard('Dark Project KD87A', 9600, 5)
-print(kb)  # Dark Project KD87A.
-print(kb.language)  # EN.
-kb.change_lang()
-print(kb.language)  # RU.
 
-# kb.language = 'CH'
-# AttributeError: property 'language' of 'KeyBoard' object has no setter
+# ДЗ 15.2
+# print(kb) # Dark Project KD87A.
+# print(kb.language) # EN.
+# kb.change_lang()
+# print(kb.language) # RU.
+
+# ДЗ 14.2
+print(phone1) # Iphone 14.
+print(repr(phone1)) # Item('Iphone 14', '120000', '5').
+print(repr(item1)) # Item('Xiaomi Lite 10', '30000', '10').
+print(phone1 + item1) # 15
+
+
